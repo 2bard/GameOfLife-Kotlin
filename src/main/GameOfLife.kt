@@ -1,5 +1,9 @@
 package main
 import javafx.application.Platform
+import javafx.scene.control.Button
+import javafx.scene.layout.GridPane
+import javafx.scene.layout.HBox
+import javafx.scene.layout.VBox
 import tornadofx.App
 import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
@@ -13,16 +17,35 @@ import kotlin.concurrent.thread
  */
 
 class GameOfLife : View() {
-    override val root = javafx.scene.layout.GridPane()
+    override val root = VBox()
+    val bottomBar = HBox()
+    val grid = GridPane()
     var theWorld: World
     val padding = 2.0
     val size = 30
     val speed = 1000L
+    var play = false
+    var button = Button("Start")
 
     init {
+        button.setOnMouseClicked {
+            if(play) {
+                this.play = false
+                button.text = "Start"
+            }
+            else {
+                this.play = true
+                button.text = "Stop"
+            }
+        }
+
+        bottomBar.add(button)
+        root.add(grid)
+        root.add(bottomBar)
+
         theWorld = World(size)
-        root.hgap = padding
-        root.vgap = padding
+        grid.hgap = padding
+        grid.vgap = padding
         theWorld.worldState[2][2].state = true
         theWorld.worldState[3][3].state = true
         theWorld.worldState[1][4].state = true
@@ -33,10 +56,12 @@ class GameOfLife : View() {
         thread {
             val timer = Timer("mainloop", true)
             timer.scheduleAtFixedRate(0, speed) {
-                theWorld.iterate()
-                Platform.runLater({
-                    drawWorld()
-                })
+                if(play){
+                    theWorld.iterate()
+                    Platform.runLater({
+                        drawWorld()
+                    })
+                }
             }
         }
     }
@@ -45,7 +70,7 @@ class GameOfLife : View() {
         theWorld.processWorld({ xPos, yPos ->
             val state = theWorld.worldState[xPos][yPos].state
             val rectangle = Rectangle(10.0,10.0, if (state) Color.RED else Color.BLUE)
-            root.add(rectangle, xPos, yPos)
+            grid.add(rectangle, xPos, yPos)
             rectangle.setOnMouseClicked {
                 theWorld.flipState(xPos,yPos)
                 drawWorld()
