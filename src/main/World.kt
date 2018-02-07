@@ -3,8 +3,7 @@ package main
 /**
  * Created by Lewis on 06/02/2018.
  */
-class World(size: Int){
-    val size: Int = size
+class World(var size: Int){
     var worldState: Array<Array<Cell>> = blankWorld()
 
     fun blankWorld(): Array<Array<Cell>>{
@@ -31,13 +30,13 @@ class World(size: Int){
 
     fun iterate(){
         this.processWorld({ xPos, yPos -> worldState[xPos][yPos].initialise(xPos,yPos,this) }, {})
-        var newWorld = blankWorld()
+        val newWorld = blankWorld()
         this.processWorld({ xPos, yPos -> newWorld[xPos][yPos].state = neighbours(xPos, yPos) }, {})
         this.worldState = newWorld
     }
 
     fun neighbours(xPos: Int, yPos: Int): Boolean{
-        var count = worldState[xPos][yPos].neighbours.filter { it.state }.count()
+        val count = worldState[xPos][yPos].neighbours.filter { it.state }.count()
         if (count < 2) return false
         else if (count == 2) return worldState[xPos][yPos].state
         else return (count == 3)

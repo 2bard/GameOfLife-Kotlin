@@ -2,12 +2,10 @@ package main
 import javafx.application.Platform
 import javafx.scene.control.Button
 import javafx.scene.layout.GridPane
-import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
-import tornadofx.App
 import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
-import tornadofx.View
+import tornadofx.*
 import java.util.*
 import kotlin.concurrent.scheduleAtFixedRate
 import kotlin.concurrent.thread
