@@ -71,12 +71,8 @@ class World(size: Int){
             return (result.size == 3)
     }
 
-    fun neighbourExists(xPos: Int, yPos: Int): Boolean{
-        if(xPos < 0 || xPos >= worldState.size)
-            return false
-        else
-            return !(yPos < 0 || yPos >= worldState[xPos].size)
-    }
+    fun neighbourExists(xPos: Int, yPos: Int): Boolean =
+            (xPos in 0..worldState.size - 1 && yPos in 0..worldState[xPos].size - 1)
 
     fun flipState(xPos: Int, yPos: Int){
         worldState[xPos][yPos].state = !worldState[xPos][yPos].state
