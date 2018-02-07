@@ -18,12 +18,11 @@ import kotlin.concurrent.thread
 
 class GameOfLife : View() {
     override val root = VBox()
-    val bottomBar = HBox()
     val grid = GridPane()
     var theWorld: World
     val padding = 2.0
     val size = 30
-    val speed = 1000L
+    val speed = 500L
     var play = false
     var button = Button("Start")
 
@@ -39,9 +38,8 @@ class GameOfLife : View() {
             }
         }
 
-        bottomBar.add(button)
         root.add(grid)
-        root.add(bottomBar)
+        root.add(button)
 
         theWorld = World(size)
         grid.hgap = padding

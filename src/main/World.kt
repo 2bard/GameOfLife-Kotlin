@@ -15,17 +15,11 @@ class World(size: Int){
         }
     }
 
-    fun print(){
-        this.processWorld({ xPos, yPos ->
-            print(if (worldState[xPos][yPos].state) "O" else "X")
-        }, { println() })
-    }
-
     fun processWorld(funcX: (Int, Int) -> Unit, funcY: () -> Unit){
         var x = 0
         var y = 0
-        worldState.map{
-            it.map{
+        worldState.forEach{
+            it.forEach{
                 funcX.invoke(x,y)
                 x++
             }
@@ -36,43 +30,21 @@ class World(size: Int){
     }
 
     fun iterate(){
+        this.processWorld({ xPos, yPos -> worldState[xPos][yPos].initialise(xPos,yPos,this) }, {})
         var newWorld = blankWorld()
-        this.processWorld({ xPos, yPos ->
-            newWorld[xPos][yPos].state = neighbours(xPos, yPos)
-        }, {})
-
-        this.worldState = newWorld;
-    }
-
-    fun checkNeighbour(xPos: Int, yPos: Int, results: ArrayList<Cell>){
-        if(neighbourExists(xPos, yPos) && worldState[xPos][yPos].state){
-            results.add(worldState[xPos][yPos])
-        }
+        this.processWorld({ xPos, yPos -> newWorld[xPos][yPos].state = neighbours(xPos, yPos) }, {})
+        this.worldState = newWorld
     }
 
     fun neighbours(xPos: Int, yPos: Int): Boolean{
-
-        var result = ArrayList<Cell>()
-
-        checkNeighbour(xPos - 1, yPos - 1, result)
-        checkNeighbour(xPos, yPos - 1, result)
-        checkNeighbour(xPos + 1, yPos - 1, result)
-        checkNeighbour(xPos - 1, yPos, result)
-        checkNeighbour(xPos + 1, yPos, result)
-        checkNeighbour(xPos - 1, yPos + 1, result)
-        checkNeighbour(xPos, yPos + 1, result)
-        checkNeighbour(xPos + 1, yPos + 1, result)
-
-        if (result.size < 2)
-            return false
-        else if (result.size == 2)
-            return worldState[xPos][yPos].state
-        else
-            return (result.size == 3)
+        var count = worldState[xPos][yPos].neighbours.filter { it.state }.count()
+        if (count < 2) return false
+        else if (count == 2) return worldState[xPos][yPos].state
+        else return (count == 3)
     }
 
-    fun neighbourExists(xPos: Int, yPos: Int): Boolean =
-            (xPos in 0..worldState.size - 1 && yPos in 0..worldState[xPos].size - 1)
+    fun neighbourExists(pos: Pair<Int,Int>): Boolean =
+            (pos.first in 0..worldState.size - 1 && pos.second in 0..worldState[pos.first].size - 1)
 
     fun flipState(xPos: Int, yPos: Int){
         worldState[xPos][yPos].state = !worldState[xPos][yPos].state
@@ -80,5 +52,13 @@ class World(size: Int){
 
     class Cell(initialState: Boolean){
         var state = initialState
+        var neighbours = emptyList<Cell>()
+
+        fun initialise(xPos: Int, yPos: Int, world: World) {
+            neighbours = arrayListOf(
+                    Pair(xPos -1, yPos -1), Pair(xPos, yPos - 1), Pair(xPos + 1, yPos - 1), Pair(xPos - 1, yPos),
+                    Pair(xPos + 1, yPos), Pair(xPos - 1, yPos + 1), Pair(xPos, yPos + 1), Pair(xPos + 1, yPos + 1)
+            ).filter { world.neighbourExists(it) }.map { world.worldState[it.first][it.second] }
+        }
     }
 }
